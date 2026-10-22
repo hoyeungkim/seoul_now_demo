@@ -3248,7 +3248,8 @@ function mountMap(){
   (result?.entries||[]).forEach((e,i)=>{
     const p=placeById(e.id),selected=state.selected===p.id,excluded=state.excluded.includes(p.id);
     const marker=L.marker([p.lat,p.lon],{icon:L.divIcon({className:`destination-marker ${selected?'selected':''} ${excluded?'excluded':''}`,html:`<span>${i+1}</span>`,iconSize:[38,38],iconAnchor:[19,19]}),title:`${p.name} · 가상 예시`,keyboard:true,autoPanOnFocus:false,zIndexOffset:selected?1000:0}).addTo(map);
-    marker.bindTooltip(esc(p.name),{permanent:true,direction:'bottom',offset:[0,18],className:`destination-label ${selected?'selected':''}`});
+    const origin=mapDemoOrigin(),nearOrigin=originInsideMap(origin)&&map.distance([p.lat,p.lon],[origin.lat,origin.lon])<450;
+    marker.bindTooltip(esc(p.name),{permanent:true,direction:nearOrigin?'top':'bottom',offset:[0,nearOrigin?-18:18],className:`destination-label ${selected?'selected':''}`});
     const el=marker.getElement();el?.setAttribute('aria-label',`${p.name} 지도 마커`);el?.setAttribute('aria-pressed',String(selected));el?.setAttribute('data-map-place',p.id);
     marker.on('click',()=>openPlaceDetail(p.id));
   });
